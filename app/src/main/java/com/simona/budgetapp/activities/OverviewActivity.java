@@ -1,4 +1,4 @@
-package com.simona.budgetapp;
+package com.simona.budgetapp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+
+import com.simona.budgetapp.R;
 
 public class OverviewActivity extends AppCompatActivity {
 

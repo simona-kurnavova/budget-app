@@ -5,6 +5,11 @@
     <string name="income">Income</string>
     <string name="expenses">Expenses</string>
     <string name="balance">Balance</string>
+    <string name="note">note</string>
+    <string name="_0_0">0.0</string>
+    <string name="note_hint">Note:</string>
+    <string name="amount_hint">Amount:</string>
+    <string name="set_date">Change date</string>
 
     <string-array name="month_array">
         <item>January</item>
