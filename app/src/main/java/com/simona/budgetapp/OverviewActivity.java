@@ -8,6 +8,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 public class OverviewActivity extends AppCompatActivity {
 
@@ -27,6 +29,12 @@ public class OverviewActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        Spinner spinner = (Spinner) findViewById(R.id.month_spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.month_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
     }
 
     @Override
