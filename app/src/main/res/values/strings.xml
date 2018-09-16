@@ -29,10 +29,12 @@
     </string-array>
 
     <string-array name="type_array">
-        <item>Income</item>
-        <item>Expense</item>
+        <item name="expense">Expense</item>
+        <item name="income">Income</item>
     </string-array>
+
     <string name="title_activity_add_category">AddCategoryActivity</string>
     <string name="name">Name:</string>
     <string name="icon">Icon:</string>
+    <string name="expense">Expense</string>
 </resources>

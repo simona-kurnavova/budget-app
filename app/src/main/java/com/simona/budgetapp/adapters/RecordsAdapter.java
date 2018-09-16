@@ -1,9 +1,8 @@
 package com.simona.budgetapp.adapters;
 
-import android.arch.lifecycle.LiveData;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,14 +15,17 @@ import com.simona.budgetapp.entities.Record;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Objects;
 
 
 public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.RecordsViewHolder> {
 
     private List<Record> mRecords;
     private List<Category> mCategories;
+    private Context mContext;
 
-    public RecordsAdapter(List<Record> records, List<Category> categories) {
+    public RecordsAdapter(Context context, List<Record> records, List<Category> categories) {
+        mContext = context;
         mRecords = records;
         mCategories = categories;
     }
@@ -45,10 +47,19 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.RecordsV
 
     @Override
     public void onBindViewHolder(RecordsViewHolder holder, int position) {
+        Log.v("adapter", mRecords.get(position).toString());
         double price_value = BigDecimal.valueOf(mRecords.get(position).getPrice())
                 .setScale(2, RoundingMode.HALF_UP)
                 .doubleValue();
         String price = Double.toString(price_value);
+        if (Objects.equals(mRecords.get(position).getType(), mContext.getString(R.string.expense))){
+            price = "- " + price;
+            holder.mPriceView.setTextColor(mContext.getResources().getColor((R.color.colorRed)));
+        }
+        else {
+            price = "+ " + price;
+            holder.mPriceView.setTextColor(mContext.getResources().getColor((R.color.colorGreen)));
+        }
         holder.mPriceView.setText(price);
 
         int category_id = mRecords.get(position).getCategory();

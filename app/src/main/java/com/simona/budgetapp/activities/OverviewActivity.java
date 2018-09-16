@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.simona.budgetapp.R;
 import com.simona.budgetapp.adapters.RecordsAdapter;
@@ -23,7 +24,10 @@ import com.simona.budgetapp.database.BudgetRepository;
 import com.simona.budgetapp.entities.Category;
 import com.simona.budgetapp.entities.Record;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 public class OverviewActivity extends AppCompatActivity {
@@ -36,9 +40,7 @@ public class OverviewActivity extends AppCompatActivity {
 
     private LiveData<List<Record>> allRecords;
 
-    private RecyclerView mRecyclerView;
     private RecordsAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +78,7 @@ public class OverviewActivity extends AppCompatActivity {
             public void onChanged(@Nullable List<Category> categories) {
                 mAdapter.updateCategories(categories);
                 mAdapter.notifyDataSetChanged();
+                updateOverviewValues();
                 Log.v(TAG, "Data state changed");
             }
         });
@@ -85,20 +88,45 @@ public class OverviewActivity extends AppCompatActivity {
             public void onChanged(@Nullable List<Record> records) {
                 mAdapter.updateRecords(records);
                 mAdapter.notifyDataSetChanged();
+                updateOverviewValues();
                 Log.v(TAG, "Data state changed");
             }
         });
 
+        updateOverviewValues();
         setRecordsView();
+    }
 
+    private void updateOverviewValues() {
+        TextView balanceView = findViewById(R.id.balance);
+        TextView incomeView = findViewById(R.id.income);
+        TextView expenseView = findViewById(R.id.expenses);
+        double expense = 0;
+        double income = 0;
+
+        if(allRecords != null && allRecords.getValue() != null) {
+            for (Record record : allRecords.getValue()) {
+                if (Objects.equals(record.getType(), getString(R.string.expense))) {
+                    expense += record.getPrice();
+                } else {
+                    income += record.getPrice();
+                }
+            }
+        }
+        incomeView.setText(String.valueOf(BigDecimal.valueOf(income).setScale(2, RoundingMode.HALF_UP)
+                .doubleValue()));
+        expenseView.setText(String.valueOf(BigDecimal.valueOf(expense).setScale(2, RoundingMode.HALF_UP)
+                .doubleValue()));
+        balanceView.setText(String.valueOf(BigDecimal.valueOf(income - expense).setScale(2, RoundingMode.HALF_UP)
+                .doubleValue()));
     }
 
     private void setRecordsView() {
-        mRecyclerView = (RecyclerView) findViewById(R.id.records_recycler_view);
+        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.records_recycler_view);
         mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(this);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new RecordsAdapter(allRecords.getValue(), allCategories.getValue());
+        mAdapter = new RecordsAdapter(this, allRecords.getValue(), allCategories.getValue());
         mRecyclerView.setAdapter(mAdapter);
     }
 
