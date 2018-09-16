@@ -31,6 +31,9 @@ public class Record {
     @ColumnInfo(name = "price")
     private double price;
 
+    @ColumnInfo(name = "type")
+    private String type;
+
     public int getId() {
         return id;
     }
@@ -76,4 +79,11 @@ public class Record {
         return "Record{" + "id=" + id + ", category=" + category + ", note='" + note + '\'' + ", price=" + price + '}';
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 }

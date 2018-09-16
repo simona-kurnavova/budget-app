@@ -2,8 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/save_record"
-        android:icon="@drawable/ic_check_accent"
+        android:id="@+id/save"
+        android:icon="@drawable/ic_check"
         android:title="fuck"
         app:showAsAction="ifRoom" />
 

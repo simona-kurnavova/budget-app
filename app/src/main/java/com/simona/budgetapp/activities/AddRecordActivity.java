@@ -1,6 +1,5 @@
 package com.simona.budgetapp.activities;
 
-import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
@@ -10,8 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.CollapsibleActionView;
+import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,9 +24,6 @@ import com.simona.budgetapp.database.BudgetRepository;
 import com.simona.budgetapp.entities.Category;
 import com.simona.budgetapp.entities.Record;
 
-import org.w3c.dom.Text;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -50,7 +45,6 @@ public class AddRecordActivity extends AppCompatActivity implements DatePickerDi
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Sets return button on action bar
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -83,7 +77,28 @@ public class AddRecordActivity extends AppCompatActivity implements DatePickerDi
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
+
+        TextView addCategoryView = findViewById(R.id.add_category_link);
+        addCategoryView.setClickable(true);
+        addCategoryView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplication(), AddCategoryActivity.class);
+                startActivity(intent);
+            }
+        });
+        addCategoryView.setMovementMethod(LinkMovementMethod.getInstance());
+
         setCategorySpinner();
+        setTypeSpinner();
+    }
+
+    private void setTypeSpinner() {
+        Spinner spinner = (Spinner) findViewById(R.id.type_spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.type_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
     }
 
     private void setCategorySpinner() {
@@ -108,14 +123,14 @@ public class AddRecordActivity extends AppCompatActivity implements DatePickerDi
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_add_record, menu);
+        getMenuInflater().inflate(R.menu.menu_add, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.save_record) {
+        if (id == R.id.save) {
             saveRecord();
             return true;
         }
@@ -128,11 +143,13 @@ public class AddRecordActivity extends AppCompatActivity implements DatePickerDi
         TextView priceView = findViewById(R.id.price_text);
         Spinner categorySpinner = findViewById(R.id.category_spinner);
         Category category = allCategories.get(categorySpinner.getSelectedItemPosition());
+        Spinner typeSpinner = findViewById(R.id.type_spinner);
 
         record.setPrice(Float.parseFloat(priceView.getText().toString()));
         record.setNote(noteView.getText().toString());
         record.setCategory(category.getId());
         record.setDate(selectedDate);
+        record.setType(typeSpinner.getSelectedItem().toString());
 
         budgetRepository.insertRecord(record);
 

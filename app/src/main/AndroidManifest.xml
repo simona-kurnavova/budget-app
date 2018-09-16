@@ -22,8 +22,17 @@
         <activity
             android:name=".activities.AddRecordActivity"
             android:label="@string/title_activity_add_record"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName="com.simona.budgetapp.activities.OverviewActivity"/>
+            android:parentActivityName=".activities.OverviewActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.AddCategoryActivity"
+            android:label="@string/title_activity_add_category"
+            android:parentActivityName=".activities.AddRecordActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.simona.budgetapp.activities.AddRecordActivity" />
+        </activity>
     </application>
 
 </manifest>
