@@ -76,7 +76,7 @@ public class Record {
 
     @Override
     public String toString() {
-        return "Record{" + "id=" + id + ", category=" + category + ", note='" + note + '\'' + ", price=" + price + '}';
+        return "category=" + category + ", note='" + note + '\'' + ", price=" + price + '}';
     }
 
     public String getType() {

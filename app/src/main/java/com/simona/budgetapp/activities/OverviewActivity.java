@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -16,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.simona.budgetapp.R;
+import com.simona.budgetapp.adapters.RecordsAdapter;
 import com.simona.budgetapp.database.BudgetRepository;
 import com.simona.budgetapp.entities.Category;
 import com.simona.budgetapp.entities.Record;
@@ -32,6 +35,10 @@ public class OverviewActivity extends AppCompatActivity {
     private LiveData<List<Category>> allCategories;
 
     private LiveData<List<Record>> allRecords;
+
+    private RecyclerView mRecyclerView;
+    private RecordsAdapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,9 +67,6 @@ public class OverviewActivity extends AppCompatActivity {
             budgetRepository = new BudgetRepository(this);
             allCategories = budgetRepository.getAllCategories();
             allRecords = budgetRepository.getAllRecords();
-
-            //Log.v(TAG, allCategories.getValue().toString());
-            //Log.v(TAG, allRecords.getValue().toString());
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
@@ -70,17 +74,32 @@ public class OverviewActivity extends AppCompatActivity {
         allCategories.observe(this, new Observer<List<Category>>() {
             @Override
             public void onChanged(@Nullable List<Category> categories) {
-
+                mAdapter.updateCategories(categories);
+                mAdapter.notifyDataSetChanged();
+                Log.v(TAG, "Data state changed");
             }
         });
 
         allRecords.observe(this, new Observer<List<Record>>() {
             @Override
             public void onChanged(@Nullable List<Record> records) {
-
+                mAdapter.updateRecords(records);
+                mAdapter.notifyDataSetChanged();
+                Log.v(TAG, "Data state changed");
             }
         });
 
+        setRecordsView();
+
+    }
+
+    private void setRecordsView() {
+        mRecyclerView = (RecyclerView) findViewById(R.id.records_recycler_view);
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mAdapter = new RecordsAdapter(allRecords.getValue(), allCategories.getValue());
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     @Override
