@@ -1,10 +1,14 @@
 package com.simona.budgetapp.activities;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,8 +16,22 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.simona.budgetapp.R;
+import com.simona.budgetapp.database.BudgetRepository;
+import com.simona.budgetapp.entities.Category;
+import com.simona.budgetapp.entities.Record;
+
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class OverviewActivity extends AppCompatActivity {
+
+    private final static String TAG = "Overview";
+
+    private BudgetRepository budgetRepository;
+
+    private LiveData<List<Category>> allCategories;
+
+    private LiveData<List<Record>> allRecords;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +55,32 @@ public class OverviewActivity extends AppCompatActivity {
                 R.array.month_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
+
+        try {
+            budgetRepository = new BudgetRepository(this);
+            allCategories = budgetRepository.getAllCategories();
+            allRecords = budgetRepository.getAllRecords();
+
+            //Log.v(TAG, allCategories.getValue().toString());
+            //Log.v(TAG, allRecords.getValue().toString());
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        allCategories.observe(this, new Observer<List<Category>>() {
+            @Override
+            public void onChanged(@Nullable List<Category> categories) {
+
+            }
+        });
+
+        allRecords.observe(this, new Observer<List<Record>>() {
+            @Override
+            public void onChanged(@Nullable List<Record> records) {
+
+            }
+        });
+
     }
 
     @Override

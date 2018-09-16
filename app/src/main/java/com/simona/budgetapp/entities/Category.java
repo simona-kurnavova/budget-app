@@ -7,8 +7,8 @@ import android.arch.persistence.room.PrimaryKey;
 
 @Entity(tableName = "category")
 public class Category {
-    @PrimaryKey
-    @ColumnInfo(name = "name")
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
     private int id;
 
     @ColumnInfo(name = "name")
@@ -39,5 +39,10 @@ public class Category {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    @Override
+    public String toString() {
+        return "Category{" + "id=" + id + ", name='" + name + '}';
     }
 }

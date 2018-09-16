@@ -2,27 +2,46 @@ package com.simona.budgetapp.activities;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.CollapsibleActionView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.simona.budgetapp.R;
+import com.simona.budgetapp.database.BudgetRepository;
+import com.simona.budgetapp.entities.Category;
+import com.simona.budgetapp.entities.Record;
 
 import org.w3c.dom.Text;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class AddRecordActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
     private TextView dateTextView;
+    private BudgetRepository budgetRepository;
+    private List<Category> allCategories;
+    private DatePickerDialog datePickerDialog;
+    private Date selectedDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +57,10 @@ public class AddRecordActivity extends AppCompatActivity implements DatePickerDi
         }
 
         Calendar now = Calendar. getInstance();
-        final DatePickerDialog datePickerDialog = new DatePickerDialog(this,
+        datePickerDialog = new DatePickerDialog(this,
                 AddRecordActivity.this, now.get(Calendar.YEAR), now.get(Calendar.MONTH),
                 now.get(Calendar.DAY_OF_MONTH));
+        selectedDate = new Date();
 
         dateTextView = findViewById(R.id.date_text);
         String today = Integer.valueOf(now.get(Calendar.DAY_OF_MONTH)).toString() + '.'
@@ -57,6 +77,33 @@ public class AddRecordActivity extends AppCompatActivity implements DatePickerDi
                     }
                 }
         );
+
+        try {
+            budgetRepository = new BudgetRepository(this);
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        setCategorySpinner();
+    }
+
+    private void setCategorySpinner() {
+        LiveData<List<Category>> categories = budgetRepository.getAllCategories();
+        categories.observe(this, new Observer<List<Category>>() {
+            @Override
+            public void onChanged(@Nullable List<Category> categories) {
+                allCategories = categories;
+                ArrayList<String> categoriesArray = new ArrayList<>();
+                if(allCategories != null) {
+                    for (Category category : allCategories) {
+                        categoriesArray.add(category.getName());
+                    }
+                }
+                Spinner spinner = findViewById(R.id.category_spinner);
+                ArrayAdapter<String> adapter =  new ArrayAdapter<String>(getApplication(), android.R.layout.simple_spinner_item, categoriesArray);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinner.setAdapter(adapter);
+            }
+        });
     }
 
     @Override
@@ -76,7 +123,21 @@ public class AddRecordActivity extends AppCompatActivity implements DatePickerDi
     }
 
     private void saveRecord() {
-        // TODO: save new record
+        Record record = new Record();
+        TextView noteView = findViewById(R.id.note_text);
+        TextView priceView = findViewById(R.id.price_text);
+        Spinner categorySpinner = findViewById(R.id.category_spinner);
+        Category category = allCategories.get(categorySpinner.getSelectedItemPosition());
+
+        record.setPrice(Float.parseFloat(priceView.getText().toString()));
+        record.setNote(noteView.getText().toString());
+        record.setCategory(category.getId());
+        record.setDate(selectedDate);
+
+        budgetRepository.insertRecord(record);
+
+        Intent intent = new Intent(this, OverviewActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -85,6 +146,7 @@ public class AddRecordActivity extends AppCompatActivity implements DatePickerDi
                 + Integer.valueOf(month).toString() + '.'
                 + Integer.valueOf(year).toString();
         dateTextView.setText(date);
+        selectedDate = new Date(year, month, dayOfMonth);
     }
 }
 

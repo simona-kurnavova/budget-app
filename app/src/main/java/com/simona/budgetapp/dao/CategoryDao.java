@@ -1,5 +1,6 @@
 package com.simona.budgetapp.dao;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -14,7 +15,7 @@ import java.util.List;
 @Dao
 public interface CategoryDao {
     @Query("SELECT * FROM category")
-    List<Category> getAll();
+    LiveData<List<Category>> getAll();
 
     @Query("SELECT * FROM category WHERE id LIKE :category_id LIMIT 1")
     Category findById(int category_id);

@@ -10,6 +10,7 @@
     <string name="note_hint">Note:</string>
     <string name="amount_hint">Amount:</string>
     <string name="set_date">Change date</string>
+    <string name="category">Category:</string>
 
     <string-array name="month_array">
         <item>January</item>

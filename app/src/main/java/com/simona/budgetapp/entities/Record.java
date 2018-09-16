@@ -4,14 +4,18 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverters;
+
+import com.simona.budgetapp.database.Converters;
 
 import java.util.Date;
+import static android.arch.persistence.room.ForeignKey.CASCADE;
 
 
 @Entity(tableName = "record",
-        foreignKeys = @ForeignKey(entity = Category.class, parentColumns = "id", childColumns = "category"))
+        foreignKeys = @ForeignKey(entity = Category.class, parentColumns = "id", childColumns = "category", onDelete = CASCADE))
 public class Record {
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     private int id;
 
     @ColumnInfo(name = "category")
@@ -20,6 +24,7 @@ public class Record {
     @ColumnInfo(name = "note")
     private String note;
 
+    @TypeConverters(Converters.class)
     @ColumnInfo(name = "date")
     private Date date;
 
@@ -65,4 +70,10 @@ public class Record {
     public void setPrice(double price) {
         this.price = price;
     }
+
+    @Override
+    public String toString() {
+        return "Record{" + "id=" + id + ", category=" + category + ", note='" + note + '\'' + ", price=" + price + '}';
+    }
+
 }
